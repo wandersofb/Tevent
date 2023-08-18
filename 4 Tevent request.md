@@ -18,7 +18,7 @@
 
 异步工作的第一步是分配内存需求。与前面的情况一样，talloc 上下文是必需的，异步请求将绑定在该上下文上。下一步是创建请求本身。
 
-```C
+```c
 struct tevent_req* tevent_req_create (TALLOC_CTX *mem_ctx, void **pstate, #type)
 ```
 
@@ -30,7 +30,7 @@ pstate 是指向私有数据的指针。在此调用过程中分配了必要的�
 
 它处理 talloc 内存分配和相关 tevent 请求的验证，因此是避免意外情况的非常有用的功能。在检查 tevent 请求所需的其他内存资源的可用性时，可以很容易地使用它。想象一个例子，尽管当前没有可用的内存资源，但仍需要额外的内存。
 
-```C
+```c
 bar = talloc(mem_ctx, struct foo);
 if(tevent_req_nomem (bar, req)) {
   // handling a problem
@@ -44,23 +44,23 @@ if(tevent_req_nomem (bar, req)) {
 将每个请求标记为已完成是 tevent 库的基本原则。如果没有将请求标记为已完成（成功或有错误），tevent 循环就无法触发适当的回调。重要的是要理解这将是一个重大威胁，因为这通常不是一个在屏幕上打印一些文本的单一功能的问题，而是请求本身可能只是一系列其他请求中的一个链接。停止一个请求会停止其他请求，内存资源不会释放，文件描述符可能保持打开，通过套接字的通信可能中断，等等。因此，重要的是要考虑是否成功地完成请求，并为所有可能的情况准备函数，这样回调就不会处理实际上无效的数据，更糟糕的是，实际上不存在这意味着可能会出现分割错误。
 
 - **手动** - 这是最常见的完成请求类型。调用此函数会将请求设置为TEVENT_REQ_DONE。这是该函数的唯一用途，应该在一切顺利时使用。通常，它在 done 函数中使用。
-```C
+```c
 void tevent_req_done (struct tevent_req *req)
 ```
 或者，请求可能会失败。
-```C
+```c
 bool tevent_req_error (struct tevent_req *req, uint64_t error)
 ```
 第二个参数采用错误的编号（由程序员声明，例如在枚举变量中）。函数 tevent_req_error() 将请求的状态设置为 TEVENT_REQ_USER_ERROR，并将错误代码存储在结构中，以便可以使用它，例如用于调试。如果将请求标记为错误的处理没有问题，则该函数返回 true —— 传递给该函数的值错误不等于 1。
 - **为请求设置超时** - 请求可以虚拟完成，或者如果过程花费太多时间，则可能超时。这被认为是请求的错误，并导致调用回调。在后台，此超时是通过时间事件设置的（如第 2 章：Tevent 事件所述），该事件最终触发将请求标记为 TEVENT_REQ_TIMED_OUT 的操作（不能被视为成功完成）。如果已经设置了超时，此操作将用新的时间值覆盖它（因此超时可能会延长），如果一切设置正确，则返回 true。
-```C
+```c
 bool tevent_req_set_endtime(struct tevent_req *req,
                             struct tevent_context *ev,
                             struct timeval endtime);
 ```
 
 - **过早触发** - 想象一下这样一种情况，嵌套子请求的某个部分最终失败，并且仍然需要触发回调。这样的例子可能是由于内存不足，导致无法为事件分配足够的内存来开始处理另一个子请求，或者是由于明显有意跳过其他过程并触发回调，而不管其他进度如何。在这些情况下，函数tevent_req_post() 非常方便，并提供了此选项。
-```C
+```c
 struct tevent_req* tevent_req_post (struct tevent_req *req,
                                     struct tevent_context *ev);
 ```
@@ -72,7 +72,7 @@ struct tevent_req* tevent_req_post (struct tevent_req *req,
 
 *Wrapper* 表示整个（子）请求级联的触发器。例如，它可能是一个时间或文件描述符事件，或者由函数 tevent_wakeup_send() 在特定时间创建的另一个请求，这是一种稍微特殊的创建方法
 
-```C
+```c
 struct tevent_req *tevent_wakeup_send(TALLOC_CTX *mem_ctx,
                                       struct tevent_context *ev,
                                       struct timeval wakeup_time);

@@ -6,7 +6,7 @@
 
 第一步也是最重要的一步是创建 tevent 队列（由结构 tevent_queue 表示），然后该队列将处于运行模式。
 
-```C
+```c
 struct tevent_queue* tevent_queue_create (TALLOC_CTX *mem_ctx, const char *name)
 ```
 
@@ -20,7 +20,7 @@ struct tevent_queue* tevent_queue_create (TALLOC_CTX *mem_ctx, const char *name)
 
 事实上，Tevent 提供了 3 种将请求插入队列的可能方法。它们之间没有太大的区别，但在某些情况下，其中一种可能比另一种更适合和更受欢迎。
 
-```C
+```c
 bool tevent_queue_add(struct tevent_queue *queue,
                       struct tevent_context *ev,
                       struct tevent_req *req,
@@ -34,7 +34,7 @@ bool tevent_queue_add(struct tevent_queue *queue,
 
 以下两个函数都有一个共同的特性 —— 它们返回表示队列中项目的 tevent 队列条目结构。除了使用结构的指针来解除分配（这也会导致将其从队列中删除）之外，对该结构没有进一步的可能处理。不同之处在于，使用以下函数可以从队列中删除 tevent 请求，而无需释放它。前面的函数只能将 tevent 请求从内存中释放，从而在逻辑上也会将其从队列中删除。在 tevent 库的这一阶段，没有通过 API 对该结构进行其他利用。在使用 tevent 进行开发时，可以更容易地进行调试，这可以被认为是此返回指针的优点。
 
-```C
+```c
 struct tevent_queue_entry *tevent_queue_add_entry(struct tevent_queue *queue,
                                                   struct tevent_context *ev,
                                                   struct tevent_req *req,
@@ -44,7 +44,7 @@ struct tevent_queue_entry *tevent_queue_add_entry(struct tevent_queue *queue,
 
 允许向队列中优化添加条目的功能是，首先检查没有项目的空队列。如果发现队列为空，则将省略向队列中插入条目的请求，并直接触发该请求。
 
-```C
+```c
 struct tevent_queue_entry *tevent_queue_add_optimize_empty(struct tevent_queue *queue,
                                                             struct tevent_context *ev,
                                                             struct tevent_req *req,
@@ -56,7 +56,7 @@ struct tevent_queue_entry *tevent_queue_add_optimize_empty(struct tevent_queue *
 
 ### 5.3 tevent 队列示例
 
-```C
+```c
 #include <stdio.h>
 #include <unistd.h>
 #include <tevent.h>

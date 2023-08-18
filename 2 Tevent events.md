@@ -140,13 +140,13 @@ int main (void) {
 
 Tevent 还提供了一个控制函数，使我们能够验证是否可以通过 Tevent 处理信号，该函数在 Tevent 库中定义，并返回一个布尔值，显示验证结果。
 
-```C
+```c
 bool tevent_signal_support (struct tevent_context *ev)
 ```
 
 检查信号支持是不必要的，但如果不能保证，这是一个很好的简单控制，可以防止程序出现意外行为或故障。当然，这样的测试不必每次都要创建信号处理程序，而只需在程序的初始化过程中的一开始就运行。之后，只需适应出现的每一种情况。
 
-```C
+```c
 #include <stdio.h>
 #include <tevent.h>
 #include <signal.h>
@@ -200,7 +200,7 @@ tevent API 中还包含了其他几个与处理文件描述符相关的函数（
 - tevent_fd_get_flags（）- 返回在与该 tevent-fd 结构连接的文件描述符上设置的标志。
 - tevent_fd_set_flags（）- 在事件的文件描述符上设置指定的标志。
 
-```C
+```c
 static void close_fd(struct tevent_context *ev, struct tevent_fd *fd_event,
                      int fd, void *private_data)
 {

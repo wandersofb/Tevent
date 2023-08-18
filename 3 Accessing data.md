@@ -4,20 +4,20 @@
 
 tevent request（通常）与用于存储异步计算所需数据的结构一起创建。对于这些私有数据，tevent 库使用 void（泛型）指针，因此任何数据类型都可以非常简单地指向。然而，这种态度需要事先对将要处理的数据类型有明确和有保证的了解。私有数据可以有两种类型：与请求本身连接，或者作为单独的参数提供给回调。有必要区分这些类型，因为每种类型的数据访问方法略有不同。如何访问作为参数直接提供给回调的数据有两种可能性。区别在于返回的指针。在一种情况下，它是函数参数中指定的数据类型，在另一种情况中，返回 void*。
 
-```C
+```c
 void tevent_req_callback_data (struct tevent_req *req, #type)
 void tevent_req_callback_data_void (struct tevent_req *req)
 ```
 
 要获得严格绑定到请求的数据，此函数是唯一的直接过程。
 
-```C
+```c
 void *tevent_req_data (struct tevent_req *req, #type)
 ```
 
 tevent 请求中的私有数据和作为参数移交的数据之间不同的两个调用的示例。
 
-```C
+```c
 #include <stdio.h>
 #include <unistd.h>
 #include <tevent.h>
@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
 
 Output of this example is:
 
-```C
+```c
 a->x: 10
 b->y: 9
 c->y: 9

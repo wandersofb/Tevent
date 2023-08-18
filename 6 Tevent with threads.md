@@ -5,7 +5,7 @@
 每个线程都必须创建自己的 tevent 上下文结构，如下 tevent_context_init(NULL) 所示，并且线程之间不能共享 talloc 内存上下文。
 以这种方式使用 tevent 的独立线程可以通过将数据写入由另一个线程上的 tevent 上下文监视的文件描述符来进行通信。例如（简化后没有错误处理）：
 
-```C
+```c
 Main thread:
 main()
 {
@@ -38,7 +38,7 @@ main()
 
 要允许 tevent 上下文从另一个线程接收异步 tevent_immediate 函数回调，请通过调用
 
-```C
+```c
 struct tevent_thread_proxy *tevent_thread_proxy_create(
                 struct tevent_context *dest_ev_ctx);
 ```
@@ -49,7 +49,7 @@ struct tevent_thread_proxy *tevent_thread_proxy_create(
 
 要在另一个线程的 tevent 循环上调度一个线程对异步 tevent_immediate 函数的调用，请使用
 
-```C
+```c
 void tevent_thread_proxy_schedule(struct tevent_thread_proxy *tp,
                                 struct tevent_immediate **pp_im,
                                 tevent_immediate_handler_t handler,
@@ -80,7 +80,7 @@ handler() 将作为一个普通的 tevent_immediate 回调从创建结构 tevent
 
 以下是一个示例（为了简单起见，没有进行错误检查）：
 
-```C
+```c
 ------------------------------------------------
 // Master thread.
 main()
